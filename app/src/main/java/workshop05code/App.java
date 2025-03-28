@@ -37,6 +37,7 @@ public class App {
         SQLiteConnectionManager wordleDatabaseConnection = new SQLiteConnectionManager("words.db");
 
         wordleDatabaseConnection.createNewDatabase("words.db");
+        wordleDatabaseConnection.createWordleTables();
         if (wordleDatabaseConnection.checkIfConnectionDefined()) {
             System.out.println("Wordle created and connected.");
         } else {
@@ -56,11 +57,11 @@ public class App {
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
+                line = line.trim().toLowerCase();
                 if (line.matches("^[a-z]{4}$")) {
                     wordleDatabaseConnection.addValidWord(i, line);
                     logger.fine("Added word: " + line);
                 } else {
-                    System.out.println("Invalid word in file: " + line);
                     logger.severe("Invalid word skipped from file: " + line);
                 }
                 i++;
