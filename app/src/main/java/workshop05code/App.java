@@ -56,13 +56,19 @@ public class App {
             String line;
             int i = 1;
             while ((line = br.readLine()) != null) {
-                System.out.println(line);
-                wordleDatabaseConnection.addValidWord(i, line);
+                if (line.matches("^[a-z]{4}$")) {
+                    wordleDatabaseConnection.addValidWord(i, line);
+                    logger.fine("Added word: " + line);
+                } else {
+                    System.out.println("Invalid word in file: " + line);
+                    logger.severe("Invalid word skipped from file: " + line);
+                }
                 i++;
             }
 
         } catch (IOException e) {
-            System.out.println("Not able to load . Sorry!");
+            logger.log(Level.SEVERE, "Unable to load data.txt", e);
+
             System.out.println(e.getMessage());
             return;
         }
@@ -74,19 +80,25 @@ public class App {
             String guess = scanner.nextLine();
 
             while (!guess.equals("q")) {
-                System.out.println("You've guessed '" + guess+"'.");
-
-                if (wordleDatabaseConnection.isValidWord(guess)) { 
-                    System.out.println("Success! It is in the the list.\n");
-                }else{
-                    System.out.println("Sorry. This word is NOT in the the list.\n");
+                if (!guess.matches("^[a-z]{4}$")) {
+                    System.out.println("Invalid input. Only 4 lowercase letters allowed (a-z). Try again.\n");
+                    logger.warning("User entered invalid word: " + guess); // Optional: log this
+                } else {
+                    System.out.println("You've guessed '" + guess + "'.");
+            
+                    if (wordleDatabaseConnection.isValidWord(guess)) {
+                        System.out.println("Success! It is in the the list.\n");
+                    } else {
+                        System.out.println("Sorry. This word is NOT in the the list.\n");
+                    }
                 }
-
+            
                 System.out.print("Enter a 4 letter word for a guess or q to quit: " );
                 guess = scanner.nextLine();
             }
         } catch (NoSuchElementException | IllegalStateException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Unhandled exception during user input", e);
+
         }
 
     }
